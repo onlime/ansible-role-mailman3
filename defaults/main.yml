@@ -22,8 +22,7 @@ mailman3_nginx_self_crt: "{{ not mailman3_install_certbot | bool }}"
 
 ## nginx-main
 mailman3_nginx_main_template: false
-mailman3_nginx_main_template_src: nginx/nginx.conf.j2
-mailman3_nginx_main_template_dest: /etc/nginx/nginx.conf
+mailman3_nginx_main_ssl_protocols: [TLSv1.2, TLSv1.3]
 mailman3_nginx_main_worker_processes: auto
 mailman3_nginx_main_worker_connections: "1024"
 mailman3_nginx_main_server_tokens: "off"
@@ -32,7 +31,7 @@ mailman3_nginx_main_keepalive_timeout: 65
 ## nginx-mailman3
 mailman3_nginx_template: true
 mailman3_nginx_site_name: 10-mailman3.conf
-mailman3_nginx_template_src: nginx/sites/{{ mailman3_nginx_site_name }}.j2
+mailman3_nginx_template_src: nginx/sites-available/{{ mailman3_nginx_site_name }}.j2
 mailman3_nginx_template_dest: /etc/nginx/sites-available/{{ mailman3_nginx_site_name }}
 mailman3_nginx_catch_all: false
 mailman3_nginx_ssl: true
@@ -43,7 +42,7 @@ mailman3_nginx_extra_includes: []
 ## nginx-status
 mailman3_nginx_status_template: true
 mailman3_nginx_status_site_name: 20-status.conf
-mailman3_nginx_status_template_src: nginx/sites/{{ mailman3_nginx_status_site_name }}.j2
+mailman3_nginx_status_template_src: nginx/sites-available/{{ mailman3_nginx_status_site_name }}.j2
 mailman3_nginx_status_template_dest: /etc/nginx/sites-available/{{ mailman3_nginx_status_site_name }}
 
 # postfix
