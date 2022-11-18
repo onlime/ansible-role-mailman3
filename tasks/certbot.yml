@@ -22,8 +22,8 @@
         vars:
           mailman3_nginx_self_crt: true
         template:
-          src: "{{ mailman3_nginx_template_src }}"
-          dest: "{{ mailman3_nginx_template_dest }}"
+          src: nginx/sites-available/{{ mailman3_nginx_site }}.j2
+          dest: /etc/nginx/sites-available/{{ mailman3_nginx_site }}
           owner: "{{ mailman3_http_user }}"
           group: "{{ mailman3_http_user }}"
           mode: 0644
@@ -38,8 +38,8 @@
       - name: reconfigure nginx
         when: mailman3_nginx_template
         template:
-          src: "{{ mailman3_nginx_template_src }}"
-          dest: "{{ mailman3_nginx_template_dest }}"
+          src: nginx/sites-available/{{ mailman3_nginx_site }}.j2
+          dest: /etc/nginx/sites-available/{{ mailman3_nginx_site }}
           owner: "{{ mailman3_http_user }}"
           group: "{{ mailman3_http_user }}"
           mode: 0644

@@ -24,45 +24,48 @@
       regexp: '^(\t*)({{ item }} .*)$'
       replace: '\1# \2'
       backup: true
-    with_items: # this configuration is moved to conf.d/ssl.conf (deployed below)
+    with_items:
       - ssl_protocols
       - ssl_prefer_server_ciphers
     notify: restart nginx
 
   - when: mailman3_nginx_template
     block:
-    - name: create nginx site {{ mailman3_nginx_site_name }}
+    - name: create nginx site {{ mailman3_nginx_site }}
       template:
-        src: "{{ mailman3_nginx_template_src }}"
-        dest: "{{ mailman3_nginx_template_dest }}"
+        src: nginx/{{ item }}.j2
+        dest: /etc/nginx/{{ item }}
         owner: "{{ mailman3_http_user }}"
         group: "{{ mailman3_http_user }}"
         mode: 0644
         backup: true
+      with_items:
+        - snippets/mailman3-site.conf
+        - sites-available/{{ mailman3_nginx_site }}
       notify: reload nginx
 
-    - name: enable nginx site {{ mailman3_nginx_site_name }}
+    - name: enable nginx site {{ mailman3_nginx_site }}
       file:
-        src: "{{ mailman3_nginx_template_dest }}"
-        dest: /etc/nginx/sites-enabled/{{ mailman3_nginx_site_name }}
+        src: /etc/nginx/sites-available/{{ mailman3_nginx_site }}
+        dest: /etc/nginx/sites-enabled/{{ mailman3_nginx_site }}
         state: link
       notify: reload nginx
 
   - when: mailman3_nginx_status_template
     block:
-    - name: create nginx site {{ mailman3_nginx_status_site_name }}
+    - name: create nginx site {{ mailman3_nginx_status_site }}
       template:
-        src: "{{ mailman3_nginx_status_template_src }}"
-        dest: "{{ mailman3_nginx_status_template_dest }}"
+        src: nginx/sites-available/{{ mailman3_nginx_status_site }}.j2
+        dest: /etc/nginx/sites-available/{{ mailman3_nginx_status_site }}
         owner: "{{ mailman3_http_user }}"
         group: "{{ mailman3_http_user }}"
         mode: 0644
       notify: reload nginx
 
-    - name: enable nginx site {{ mailman3_nginx_status_site_name }}
+    - name: enable nginx site {{ mailman3_nginx_status_site }}
       file:
-        src: "{{ mailman3_nginx_status_template_dest }}"
-        dest: /etc/nginx/sites-enabled/{{ mailman3_nginx_status_site_name }}
+        src: /etc/nginx/sites-available/{{ mailman3_nginx_status_site }}
+        dest: /etc/nginx/sites-enabled/{{ mailman3_nginx_status_site }}
         state: link
       notify: reload nginx
 

@@ -6,6 +6,13 @@ upstream mailman {
     server unix:/run/mailman3-web/uwsgi.sock weight=1 fail_timeout=0;
 }
 server {
+    # IMPORTANT: http://localhost/hyperkitty/ should not get redirected to https
+    listen 80;
+    listen [::]:80;
+    server_name localhost;
+    include snippets/mailman3-site.conf;
+}
+server {
     listen 80;
     listen [::]:80;
     server_name {{ '_' if mailman3_nginx_catch_all else mailman3_server_name }};
@@ -29,20 +36,7 @@ server {
 {% endif %}
     client_max_body_size {{ mailman3_nginx_client_max_body_size }};
 
-    location / {
-        include "/etc/nginx/uwsgi_params";
-        uwsgi_pass mailman;
-    }
-
-    location /mailman3/static {
-        alias /var/lib/mailman3/web/static;
-
-    }
-
-    location /mailman3/static/favicon.ico {
-        alias /var/lib/mailman3/web/static/postorius/img/favicon.ico;
-
-    }
+    include snippets/mailman3-site.conf;
 
     access_log  /var/log/nginx/mailman_access.log  combined;
     error_log /var/log/nginx/mailman_error.log warn;

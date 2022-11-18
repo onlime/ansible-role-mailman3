@@ -1,0 +1,12 @@
+location / {
+    include "/etc/nginx/uwsgi_params";
+    uwsgi_pass mailman;
+}
+
+location /mailman3/static {
+    alias /var/lib/mailman3/web/static;
+}
+
+location /mailman3/static/favicon.ico {
+    alias /var/lib/mailman3/web/static/postorius/img/favicon.ico;
+}
