@@ -17,26 +17,42 @@
       backup: true
     notify: reload nginx
 
-  - name: nginx mailman config template
-    when: mailman3_nginx_template
-    template:
-      src: "{{ mailman3_nginx_template_src }}"
-      dest: "{{ mailman3_nginx_template_dest }}"
-      owner: "{{ mailman3_http_user }}"
-      group: "{{ mailman3_http_user }}"
-      mode: 0644
-      backup: true
-    notify: reload nginx
+  - when: mailman3_nginx_template
+    block:
+    - name: create nginx site {{ mailman3_nginx_site_name }}
+      template:
+        src: "{{ mailman3_nginx_template_src }}"
+        dest: "{{ mailman3_nginx_template_dest }}"
+        owner: "{{ mailman3_http_user }}"
+        group: "{{ mailman3_http_user }}"
+        mode: 0644
+        backup: true
+      notify: reload nginx
 
-  - name: nginx status template
-    when: mailman3_nginx_status_template
-    template:
-      src: "{{ mailman3_nginx_status_template_src }}"
-      dest: "{{ mailman3_nginx_status_template_dest }}"
-      owner: "{{ mailman3_http_user }}"
-      group: "{{ mailman3_http_user }}"
-      mode: 0644
-    notify: reload nginx
+    - name: enable nginx site {{ mailman3_nginx_site_name }}
+      file:
+        src: "{{ mailman3_nginx_template_dest }}"
+        dest: /etc/nginx/sites-enabled/{{ mailman3_nginx_site_name }}
+        state: link
+      notify: reload nginx
+
+  - when: mailman3_nginx_status_template
+    block:
+    - name: create nginx site {{ mailman3_nginx_status_site_name }}
+      template:
+        src: "{{ mailman3_nginx_status_template_src }}"
+        dest: "{{ mailman3_nginx_status_template_dest }}"
+        owner: "{{ mailman3_http_user }}"
+        group: "{{ mailman3_http_user }}"
+        mode: 0644
+      notify: reload nginx
+
+    - name: enable nginx site {{ mailman3_nginx_status_site_name }}
+      file:
+        src: "{{ mailman3_nginx_status_template_dest }}"
+        dest: /etc/nginx/sites-enabled/{{ mailman3_nginx_status_site_name }}
+        state: link
+      notify: reload nginx
 
   - name: remove nginx default config
     when: mailman3_nginx_remove_default
