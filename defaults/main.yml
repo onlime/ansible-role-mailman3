@@ -109,6 +109,7 @@ mailman3_web_admin_mail: '{{ mailman3_mail }}'
 mailman3_web_from_email: 'postorius@{{ mailman3_server_name }}'
 mailman3_web_server_email: 'root@{{ mailman3_server_name }}'
 mailman3_web_language_code: en-us
+mailman3_web_filter_vhost: true
 mailman3_web_domain: localhost.local
 mailman3_web_base_url: http://localhost/
 mailman3_web_apps:
