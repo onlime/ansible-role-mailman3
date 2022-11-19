@@ -6,37 +6,68 @@
       state: present
       cache_valid_time: 600
 
-  - name: nginx main config template
+  - name: deploy nginx main config nginx.conf
     when: mailman3_nginx_main_template
     template:
-      src: "{{ mailman3_nginx_main_template_src }}"
-      dest: "{{ mailman3_nginx_main_template_dest }}"
+      src: nginx/nginx.conf.j2
+      dest: /etc/nginx/nginx.conf
       owner: "{{ mailman3_http_user }}"
       group: "{{ mailman3_http_user }}"
       mode: 0644
       backup: true
-    notify: reload nginx
+    notify: restart nginx
 
-  - name: nginx mailman config template
-    when: mailman3_nginx_template
-    template:
-      src: "{{ mailman3_nginx_template_src }}"
-      dest: "{{ mailman3_nginx_template_dest }}"
-      owner: "{{ mailman3_http_user }}"
-      group: "{{ mailman3_http_user }}"
-      mode: 0644
+  - name: disable ssl configuration in nginx.conf (moved to conf.d/ssl.conf)
+    when: mailman3_nginx_ssl and not mailman3_nginx_main_template
+    replace:
+      dest: /etc/nginx/nginx.conf
+      regexp: '^(\t*)({{ item }} .*)$'
+      replace: '\1# \2'
       backup: true
-    notify: reload nginx
+    with_items:
+      - ssl_protocols
+      - ssl_prefer_server_ciphers
+    notify: restart nginx
 
-  - name: nginx status template
-    when: mailman3_nginx_status_template
-    template:
-      src: "{{ mailman3_nginx_status_template_src }}"
-      dest: "{{ mailman3_nginx_status_template_dest }}"
-      owner: "{{ mailman3_http_user }}"
-      group: "{{ mailman3_http_user }}"
-      mode: 0644
-    notify: reload nginx
+  - when: mailman3_nginx_template
+    block:
+    - name: create nginx site {{ mailman3_nginx_site }}
+      template:
+        src: nginx/{{ item }}.j2
+        dest: /etc/nginx/{{ item }}
+        owner: "{{ mailman3_http_user }}"
+        group: "{{ mailman3_http_user }}"
+        mode: 0644
+        backup: true
+      with_items:
+        - snippets/mailman3-site.conf
+        - sites-available/{{ mailman3_nginx_site }}
+      notify: reload nginx
+
+    - name: enable nginx site {{ mailman3_nginx_site }}
+      file:
+        src: /etc/nginx/sites-available/{{ mailman3_nginx_site }}
+        dest: /etc/nginx/sites-enabled/{{ mailman3_nginx_site }}
+        state: link
+      notify: reload nginx
+
+  - when: mailman3_nginx_status_template
+    block:
+    - name: create nginx site {{ mailman3_nginx_status_site }}
+      template:
+        src: nginx/sites-available/{{ mailman3_nginx_status_site }}.j2
+        dest: /etc/nginx/sites-available/{{ mailman3_nginx_status_site }}
+        owner: "{{ mailman3_http_user }}"
+        group: "{{ mailman3_http_user }}"
+        mode: 0644
+      notify: reload nginx
+
+    - name: enable nginx site {{ mailman3_nginx_status_site }}
+      file:
+        src: /etc/nginx/sites-available/{{ mailman3_nginx_status_site }}
+        dest: /etc/nginx/sites-enabled/{{ mailman3_nginx_status_site }}
+        state: link
+      notify: reload nginx
 
   - name: remove nginx default config
     when: mailman3_nginx_remove_default
@@ -57,3 +88,10 @@
         openssl_dhparam:
           path: /etc/nginx/dhparam.pem
           size: 2048
+
+      - name: Install ssl.conf
+        template:
+          src: nginx/conf.d/ssl.conf.j2
+          dest: /etc/nginx/conf.d/ssl.conf
+          mode: 0644
+        notify: restart nginx

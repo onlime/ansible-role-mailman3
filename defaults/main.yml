@@ -22,8 +22,7 @@ mailman3_nginx_self_crt: "{{ not mailman3_install_certbot | bool }}"
 
 ## nginx-main
 mailman3_nginx_main_template: false
-mailman3_nginx_main_template_src: nginx.conf.j2
-mailman3_nginx_main_template_dest: /etc/nginx/nginx.conf
+mailman3_nginx_main_ssl_protocols: [TLSv1.2, TLSv1.3]
 mailman3_nginx_main_worker_processes: auto
 mailman3_nginx_main_worker_connections: "1024"
 mailman3_nginx_main_server_tokens: "off"
@@ -31,16 +30,16 @@ mailman3_nginx_main_keepalive_timeout: 65
 
 ## nginx-mailman3
 mailman3_nginx_template: true
-mailman3_nginx_template_src: mailman3.conf.j2
-mailman3_nginx_template_dest: /etc/nginx/sites-enabled/mailman3.conf
+mailman3_nginx_site: 10-mailman3.conf
+mailman3_nginx_catch_all: false
 mailman3_nginx_ssl: true
 mailman3_nginx_ssl_options: "default_server http2"
 mailman3_nginx_client_max_body_size: 75M
+mailman3_nginx_extra_includes: []
 
 ## nginx-status
 mailman3_nginx_status_template: true
-mailman3_nginx_status_template_src: status.conf.j2
-mailman3_nginx_status_template_dest: /etc/nginx/sites-enabled/status.conf
+mailman3_nginx_status_site: 20-status.conf
 
 # postfix
 mailman3_install_postfix: true
@@ -110,6 +109,7 @@ mailman3_web_admin_mail: '{{ mailman3_mail }}'
 mailman3_web_from_email: 'postorius@{{ mailman3_server_name }}'
 mailman3_web_server_email: 'root@{{ mailman3_server_name }}'
 mailman3_web_language_code: en-us
+mailman3_web_filter_vhost: true
 mailman3_web_domain: localhost.local
 mailman3_web_base_url: http://localhost/
 mailman3_web_apps:
