@@ -108,6 +108,7 @@ USE_TZ = True
 # Filter the list of available lists in Postorius and Hyperkitty depending on 
 # the domain they are being currently served from.
 # https://docs.mailman3.org/en/latest/config-web.html#configure-postorius-hyperkitty
+# https://docs.mailman3.org/projects/mailman-web/en/latest/settings.html
 FILTER_VHOST = {{ mailman3_web_filter_vhost | bool }}
 
 # Set default domain for email addresses.
