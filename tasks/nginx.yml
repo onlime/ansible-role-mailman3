@@ -29,6 +29,23 @@
       - ssl_prefer_server_ciphers
     notify: restart nginx
 
+  - when: mailman3_nginx_http_access and mailman3_nginx_htpasswd
+    block:
+    - name: Install passlib for htaccess
+      apt:
+        name: python3-passlib
+
+    - name: Nginx | Create htpasswd
+      community.general.htpasswd:
+        path: '{{ mailman3_nginx_htpasswd_path }}'
+        name: '{{ item.user }}'
+        password: '{{ item.pass }}'
+        mode: 0640
+        owner: '{{ mailman3_http_user  }}'
+        group: '{{ mailman3_http_user  }}'
+      with_items: '{{ mailman3_nginx_htpasswd_users }}'
+      no_log: true # prevent plaintext password output
+
   - when: mailman3_nginx_template
     block:
     - name: create nginx site {{ mailman3_nginx_site }}
@@ -41,6 +58,7 @@
         backup: true
       with_items:
         - snippets/mailman3-site.conf
+        - snippets/mailman3-http-access.conf
         - sites-available/{{ mailman3_nginx_site }}
       notify: reload nginx
 

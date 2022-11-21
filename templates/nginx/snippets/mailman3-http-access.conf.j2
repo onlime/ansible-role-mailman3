@@ -1,0 +1,15 @@
+{% if mailman3_nginx_http_allow %}
+satisfy {{ mailman3_nginx_http_satisfy }};
+{%   for address in mailman3_nginx_http_deny %}
+deny {{ address }};
+{%   endfor %}
+{%   for address in mailman3_nginx_http_allow %}
+allow {{ address }};
+{%   endfor %}
+deny all;
+
+{% endif %}
+{% if mailman3_nginx_htpasswd %}
+auth_basic           "{{ mailman3_nginx_htpasswd_msg | default('Restricted') }}";
+auth_basic_user_file {{ mailman3_nginx_htpasswd_path }};
+{% endif %}
