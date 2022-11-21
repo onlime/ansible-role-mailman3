@@ -20,6 +20,16 @@ mailman3_http_user: www-data
 mailman3_nginx_remove_default: false
 mailman3_nginx_self_crt: "{{ not mailman3_install_certbot | bool }}"
 
+# nginx HTTP Basic authentication
+mailman3_nginx_http_access: false
+mailman3_nginx_http_satisfy: any
+mailman3_nginx_http_deny: []
+mailman3_nginx_http_allow: []
+mailman3_nginx_htpasswd: true
+mailman3_nginx_htpasswd_path: /etc/nginx/.htpasswd
+mailman3_nginx_htpasswd_users:
+  - { user: "mailman", pass: "change_mailman_pass" }
+
 ## nginx-main
 mailman3_nginx_main_template: false
 mailman3_nginx_main_ssl_protocols: [TLSv1.2, TLSv1.3]
