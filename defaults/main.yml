@@ -5,6 +5,7 @@ mailman3_locale: en
 mailman3_mail: "mailman-admin@{{ mailman3_domain }}"
 mailman3_tz: UTC
 mailman3_update_translations: false
+mailman3_mta_remove_dkim_headers: false
 
 # secrets, please change them
 mailman3_secret_key: "change_secretkey"
@@ -94,7 +95,8 @@ mailman3_cfg:
     class: mailman_hyperkitty.Archiver
     enable: 'yes'
     configuration: /etc/mailman3/mailman-hyperkitty.cfg
-# mta: # section
+  mta: # section
+    remove_dkim_headers: "{{ 'yes' if mailman3_mta_remove_dkim_headers else 'no' }}"
 #   incoming: mailman.mta.postfix.LMTP
 #   outgoing: mailman.mta.deliver.deliver
 #   smtp_host: localhost
