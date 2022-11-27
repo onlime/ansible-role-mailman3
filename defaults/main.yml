@@ -88,7 +88,7 @@ mailman3_cfg:
     noreply_address: "noreply@{{ mailman3_domain }}"
     default_language: "{{ mailman3_locale }}"
   database:
-    url: "postgres://mailman3:{{ mailman3_db_pass }}@localhost/mailman3"
+    url: "postgresql://mailman3:{{ mailman3_db_pass }}@localhost/mailman3"
   webservice:
     admin_pass: "{{ mailman3_rest_api_pass }}"
   archiver.hyperkitty:
