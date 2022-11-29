@@ -10,6 +10,7 @@ server {
     listen 80;
     listen [::]:80;
     server_name localhost;
+    client_max_body_size {{ mailman3_nginx_client_max_body_size }};
     include snippets/mailman3-site.conf;
 }
 server {
