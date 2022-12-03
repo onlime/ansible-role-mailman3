@@ -91,6 +91,7 @@ mailman3_cfg:
     url: "postgresql://mailman3:{{ mailman3_db_pass }}@localhost/mailman3"
   webservice:
     admin_pass: "{{ mailman3_rest_api_pass }}"
+    workers: "{{ mailman3_webservice_workers | default(4) }}"
   archiver.hyperkitty:
     class: mailman_hyperkitty.Archiver
     enable: 'yes'
